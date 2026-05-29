@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --card: #141414;
+    --border: #2a2a2a;
+    --x-color: #ff6f61;
+    --o-color: #6fa8dc;
+    --accent: #ff80bf;
+    --text: #f2f2f2;
+    --muted: #555;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: radial-gradient(circle at center, #111, #000);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,128,191,0.12), transparent 70%);
+    top: -200px; left: -200px;
+    pointer-events: none;
+    animation: drift 14s ease-in-out infinite alternate;
+  }
+  body::after {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(111,168,220,0.1), transparent 70%);
+    bottom: -200px; right: -200px;
+    pointer-events: none;
+    animation: drift2 14s ease-in-out infinite alternate;
+  }
+  @keyframes drift { from{transform:translate(0,0)} to{transform:translate(60px,40px)} }
+  @keyframes drift2 { from{transform:translate(0,0)} to{transform:translate(-60px,-40px)} }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .title-row {
+    text-align: center;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(255,128,191,0.5);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .turn-indicator {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    min-height: 20px;
+    transition: color 0.3s;
+  }
+  .turn-indicator .sym {
+    font-weight: 700;
+  }
+  .turn-indicator .sym.x { color: var(--x-color); }
+  .turn-indicator .sym.o { color: var(--o-color); }
+
+  /* Score bar */
+  .score-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+  .score-box {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 8px;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+  .score-box.active-x { border-color: var(--x-color); box-shadow: 0 0 12px rgba(255,111,97,0.25); }
+  .score-box.active-o { border-color: var(--o-color); box-shadow: 0 0 12px rgba(111,168,220,0.25); }
+  .score-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .score-val {
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+  .score-box:nth-child(1) .score-val { color: var(--x-color); text-shadow: 0 0 14px rgba(255,111,97,0.4); }
+  .score-box:nth-child(3) .score-val { color: var(--o-color); text-shadow: 0 0 14px rgba(111,168,220,0.4); }
+  .score-box:nth-child(2) .score-val { color: var(--muted); font-size: 1.2rem; }
+
+  /* Board */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    position: relative;
+  }
+  .cell {
+    aspect-ratio: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 2.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    user-select: none;
+    color: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .cell:hover:not(.taken) {
+    background: #1e1e1e;
+    transform: scale(1.05);
+    box-shadow: 0 0 18px rgba(255,128,191,0.2);
+  }
+  .cell.x {
+    color: var(--x-color);
+    text-shadow: 0 0 20px rgba(255,111,97,0.7);
+    border-color: rgba(255,111,97,0.3);
+    background: rgba(255,111,97,0.06);
+    cursor: default;
+  }
+  .cell.o {
+    color: var(--o-color);
+    text-shadow: 0 0 20px rgba(111,168,220,0.7);
+    border-color: rgba(111,168,220,0.3);
+    background: rgba(111,168,220,0.06);
+    cursor: default;
+  }
+  .cell.taken { cursor: default; }
+  .cell.win {
+    animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .cell.win.x { background: rgba(255,111,97,0.18); border-color: var(--x-color); box-shadow: 0 0 20px rgba(255,111,97,0.4); }
+  .cell.win.o { background: rgba(111,168,220,0.18); border-color: var(--o-color); box-shadow: 0 0 20px rgba(111,168,220,0.4); }
+  @keyframes pop { 0%{transform:scale(0.8)} 60%{transform:scale(1.1)} 100%{transform:scale(1)} }
+
+  /* Result banner */
+  .result-banner {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s, transform 0.35s;
+    pointer-events: none;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .result-banner.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .result-banner.win-x { border-color: var(--x-color); box-shadow: 0 0 20px rgba(255,111,97,0.2); }
+  .result-banner.win-o { border-color: var(--o-color); box-shadow: 0 0 20px rgba(111,168,220,0.2); }
+  .result-text { font-size: 1rem; font-weight: 600; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 10px; width: 100%; }
+  .btn {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-restart {
+    background: var(--accent);
+    color: #0d0d0d;
+    box-shadow: 0 4px 18px rgba(255,128,191,0.35);
+  }
+  .btn-restart:hover { transform: scale(1.04); box-shadow: 0 6px 24px rgba(255,128,191,0.5); }
+  .btn-reset-score {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-reset-score:hover { border-color: #444; color: var(--text); }
+
+  @media (max-width: 360px) {
+    h1 { font-size: 1.7rem; }
+    .cell { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title-row">
+    <h1>Tic Tac Toe</h1>
+    <div class="turn-indicator" id="turn-indicator"></div>
+  </div>
+
+  <div class="score-row">
+    <div class="score-box" id="score-x-box">
+      <div class="score-label">Player X</div>
+      <div class="score-val" id="score-x">0</div>
+    </div>
+    <div class="score-box">
+      <div class="score-label">Draws</div>
+      <div class="score-val" id="score-d">0</div>
+    </div>
+    <div class="score-box" id="score-o-box">
+      <div class="score-label">Player O</div>
+      <div class="score-val" id="score-o">0</div>
+    </div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+  </div>
+
+  <div class="result-banner" id="result-banner">
+    <div class="result-text" id="result-text"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-restart" id="restart-btn">New Round</button>
+    <button class="btn btn-reset-score" id="reset-score-btn">Reset Scores</button>
+  </div>
+</div>
+
+<script>
+const cells = document.querySelectorAll('.cell');
+const turnIndicator = document.getElementById('turn-indicator');
+const resultBanner = document.getElementById('result-banner');
+const resultText = document.getElementById('result-text');
+const scoreX = document.getElementById('score-x');
+const scoreO = document.getElementById('score-o');
+const scoreD = document.getElementById('score-d');
+const scoreXBox = document.getElementById('score-x-box');
+const scoreOBox = document.getElementById('score-o-box');
+
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board = Array(9).fill(null);
+let isX = true;
+let gameOver = false;
+let scores = { x: 0, o: 0, d: 0 };
+
+function setTurn() {
+  if (gameOver) return;
+  const sym = isX ? 'X' : 'O';
+  const cls = isX ? 'x' : 'o';
+  turnIndicator.innerHTML = `<span class="sym ${cls}">${sym}</span>'s turn`;
+  scoreXBox.className = 'score-box' + (isX ? ' active-x' : '');
+  scoreOBox.className = 'score-box' + (!isX ? ' active-o' : '');
+}
+
+function checkWin(b, sym) {
+  return WINS.find(combo => combo.every(i => b[i] === sym)) || null;
+}
+
+function handleClick(e) {
+  const idx = parseInt(e.target.dataset.index);
+  if (gameOver || board[idx]) return;
+  const sym = isX ? 'X' : 'O';
+  board[idx] = sym;
+  const cell = cells[idx];
+  cell.textContent = sym;
+  cell.classList.add(isX ? 'x' : 'o', 'taken');
+
+  const win = checkWin(board, sym);
+  if (win) {
+    win.forEach(i => cells[i].classList.add('win'));
+    showResult(sym === 'X' ? 'win-x' : 'win-o', `🎉 Player ${sym} wins!`);
+    scores[sym.toLowerCase()]++;
+    updateScores();
+    gameOver = true;
+    turnIndicator.innerHTML = '';
+    return;
+  }
+  if (board.every(Boolean)) {
+    showResult('', "🤝 It's a draw!");
+    scores.d++;
+    updateScores();
+    gameOver = true;
+    turnIndicator.innerHTML = '';
+    return;
+  }
+  isX = !isX;
+  setTurn();
+}
+
+function showResult(cls, msg) {
+  resultBanner.className = 'result-banner show ' + cls;
+  resultText.textContent = msg;
+}
+
+function updateScores() {
+  scoreX.textContent = scores.x;
+  scoreO.textContent = scores.o;
+  scoreD.textContent = scores.d;
+}
+
+function restart() {
+  board = Array(9).fill(null);
+  gameOver = false;
+  cells.forEach(c => { c.textContent = ''; c.className = 'cell'; });
+  resultBanner.className = 'result-banner';
+  scoreXBox.className = 'score-box';
+  scoreOBox.className = 'score-box';
+  setTurn();
+}
+
+cells.forEach(c => c.addEventListener('click', handleClick));
+document.getElementById('restart-btn').addEventListener('click', restart);
+document.getElementById('reset-score-btn').addEventListener('click', () => {
+  scores = { x: 0, o: 0, d: 0 };
+  updateScores();
+  restart();
+});
+
+restart();
+</script>
+</body>
+</html>
