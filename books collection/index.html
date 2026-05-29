@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Reading Space 📚</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="light-mode">
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-icon">📚</span>
+    <span class="logo-text">My Reading Space</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-item active" data-section="home" href="#">
+      <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+    </a>
+    <a class="nav-item" data-section="library" href="#">
+      <span class="nav-icon">📖</span><span class="nav-label">Library</span>
+    </a>
+    <a class="nav-item" data-section="add-book" href="#">
+      <span class="nav-icon">➕</span><span class="nav-label">Add Book</span>
+    </a>
+    <a class="nav-item" data-section="notes" href="#">
+      <span class="nav-icon">📝</span><span class="nav-label">Notes</span>
+    </a>
+    <a class="nav-item" data-section="documents" href="#">
+      <span class="nav-icon">📄</span><span class="nav-label">Documents</span>
+    </a>
+    <a class="nav-item" data-section="favorites" href="#">
+      <span class="nav-icon">⭐</span><span class="nav-label">Favorites</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a class="nav-item" data-section="settings" href="#">
+      <span class="nav-icon">⚙️</span><span class="nav-label">Settings</span>
+    </a>
+    <button class="dark-toggle" id="darkToggle" title="Toggle dark mode">
+      <span id="darkIcon">🌙</span>
+      <span class="nav-label">Dark Mode</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Mobile hamburger -->
+<button class="hamburger" id="hamburger">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="main-content" id="mainContent">
+
+  <!-- ===== HOME ===== -->
+  <section class="section active" id="section-home">
+    <div class="hero">
+      <div class="hero-text">
+        <div class="hero-eyebrow">Your Personal Library</div>
+        <h1 class="hero-title">A home for every<br/><em>book you love.</em></h1>
+        <p class="hero-desc">Organize your books, notes, and thoughts in one beautiful space. Because every reader deserves a library of their own.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="navigate('library')">Explore Library</button>
+          <button class="btn-outline" onclick="navigate('add-book')">Add Your First Book</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-shelf">
+          <div class="shelf-book" style="--c:#8b6f6f;--h:140px;">
+            <span>The<br/>Alchemist</span>
+          </div>
+          <div class="shelf-book" style="--c:#6f7f8b;--h:160px;">
+            <span>Atomic<br/>Habits</span>
+          </div>
+          <div class="shelf-book" style="--c:#7b8b6f;--h:150px;">
+            <span>It Ends<br/>With Us</span>
+          </div>
+          <div class="shelf-book" style="--c:#8b7b6f;--h:135px;">
+            <span>Verity</span>
+          </div>
+          <div class="shelf-book" style="--c:#6f6f8b;--h:155px;">
+            <span>Rich Dad<br/>Poor Dad</span>
+          </div>
+        </div>
+        <div class="shelf-base"></div>
+        <div class="hero-quote-card">
+          <span class="quote-tiny">"Just one more chapter"</span>
+          <span class="quote-heart">💜</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <span class="stat-icon">📚</span>
+        <div class="stat-info">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-label">Books in Library</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✅</span>
+        <div class="stat-info">
+          <div class="stat-num" id="statCompleted">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📖</span>
+        <div class="stat-info">
+          <div class="stat-num" id="statReading">0</div>
+          <div class="stat-label">Currently Reading</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✏️</span>
+        <div class="stat-info">
+          <div class="stat-num" id="statNotes">0</div>
+          <div class="stat-label">Notes Written</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Books -->
+    <div class="section-header">
+      <h2 class="section-title">Recently Added</h2>
+      <button class="link-btn" onclick="navigate('library')">View all →</button>
+    </div>
+    <div class="book-grid" id="homeRecentBooks"></div>
+  </section>
+
+  <!-- ===== LIBRARY ===== -->
+  <section class="section" id="section-library">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">My Library</h2>
+        <p class="page-sub">All the books you've added to your space.</p>
+      </div>
+      <button class="btn-primary" onclick="navigate('add-book')">＋ Add Book</button>
+    </div>
+
+    <div class="library-controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="librarySearch" type="text" placeholder="Search books, authors, genres…"/>
+      </div>
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-filter="all">All Books</button>
+        <button class="filter-tab" data-filter="reading">Currently Reading</button>
+        <button class="filter-tab" data-filter="completed">Completed</button>
+        <button class="filter-tab" data-filter="wishlist">Wishlist</button>
+      </div>
+    </div>
+
+    <div class="book-grid" id="libraryGrid"></div>
+    <div class="empty-state hidden" id="libraryEmpty">
+      <div class="empty-icon">📭</div>
+      <p>No books found. <button class="link-btn" onclick="navigate('add-book')">Add one?</button></p>
+    </div>
+  </section>
+
+  <!-- ===== ADD BOOK ===== -->
+  <section class="section" id="section-add-book">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Add a Book</h2>
+        <p class="page-sub">Expand your personal library.</p>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-preview">
+        <div class="form-cover-preview" id="coverPreview">
+          <span>📖</span>
+          <p>Book Cover</p>
+        </div>
+        <div class="cover-input-wrap">
+          <label class="cover-label" for="coverColor">Cover Color</label>
+          <input type="color" id="coverColor" value="#8b7b6f" class="cover-color"/>
+          <label class="cover-label" for="coverEmoji">Cover Emoji</label>
+          <input type="text" id="coverEmoji" placeholder="e.g. 🌿" maxlength="2" class="emoji-input"/>
+        </div>
+      </div>
+
+      <form class="add-form" id="addBookForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Book Title *</label>
+            <input type="text" id="bookTitle" placeholder="Enter title…" required/>
+          </div>
+          <div class="form-group">
+            <label>Author *</label>
+            <input type="text" id="bookAuthor" placeholder="Author name…" required/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Genre</label>
+            <input type="text" id="bookGenre" placeholder="e.g. Fiction, Self-Help…"/>
+          </div>
+          <div class="form-group">
+            <label>Total Pages</label>
+            <input type="number" id="bookPages" placeholder="e.g. 320" min="1"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Reading Status</label>
+            <select id="bookStatus">
+              <option value="wishlist">Wishlist</option>
+              <option value="reading">Currently Reading</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pages Read</label>
+            <input type="number" id="bookPagesRead" placeholder="e.g. 150" min="0"/>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Description / Notes</label>
+          <textarea id="bookDesc" rows="3" placeholder="A short description or your initial thoughts…"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Add to Library ✨</button>
+          <button type="button" class="btn-outline" onclick="navigate('library')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== BOOK DETAIL ===== -->
+  <section class="section" id="section-book-detail">
+    <button class="back-btn" onclick="navigate('library')">← Back to Library</button>
+    <div class="detail-layout" id="detailLayout"></div>
+  </section>
+
+  <!-- ===== NOTES ===== -->
+  <section class="section" id="section-notes">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">My Notes</h2>
+        <p class="page-sub">All your thoughts in one place.</p>
+      </div>
+      <button class="btn-primary" id="newNoteBtn">＋ New Note</button>
+    </div>
+
+    <div class="notes-layout">
+      <div class="notes-list" id="notesList"></div>
+      <div class="notes-editor" id="notesEditor">
+        <div class="editor-placeholder">
+          <div class="editor-ph-icon">✏️</div>
+          <p>Select a note to edit, or create a new one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DOCUMENTS ===== -->
+  <section class="section" id="section-documents">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">My Documents</h2>
+        <p class="page-sub">Create and organize your documents.</p>
+      </div>
+      <button class="btn-primary" id="newDocBtn">＋ New Document</button>
+    </div>
+
+    <div class="docs-layout" id="docsLayout">
+      <div class="docs-grid" id="docsGrid"></div>
+      <div class="docs-editor hidden" id="docsEditor">
+        <div class="doc-editor-header">
+          <button class="back-btn" id="closeDocEditor">← Back to Documents</button>
+          <div class="doc-save-wrap">
+            <span class="autosave-label" id="autosaveLabel">All changes saved</span>
+            <button class="btn-primary btn-sm" id="saveDocBtn">Save</button>
+          </div>
+        </div>
+        <input class="doc-title-input" id="docTitleInput" placeholder="Document title…"/>
+        <div class="doc-toolbar">
+          <button onclick="execFmt('bold')" title="Bold"><b>B</b></button>
+          <button onclick="execFmt('italic')" title="Italic"><i>I</i></button>
+          <button onclick="execFmt('underline')" title="Underline"><u>U</u></button>
+          <span class="toolbar-sep">|</span>
+          <button onclick="execFmt('insertUnorderedList')" title="Bullet list">• List</button>
+          <button onclick="execFmt('insertOrderedList')" title="Numbered list">1. List</button>
+          <span class="toolbar-sep">|</span>
+          <button onclick="execFmt('formatBlock','h2')" title="Heading">H2</button>
+          <button onclick="execFmt('formatBlock','p')" title="Paragraph">¶</button>
+        </div>
+        <div class="doc-editor-body" id="docBody" contenteditable="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAVORITES ===== -->
+  <section class="section" id="section-favorites">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Favorites</h2>
+        <p class="page-sub">Your most cherished books.</p>
+      </div>
+    </div>
+    <div class="book-grid" id="favoritesGrid"></div>
+    <div class="empty-state hidden" id="favoritesEmpty">
+      <div class="empty-icon">💫</div>
+      <p>No favorites yet. Star a book to save it here!</p>
+    </div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section class="section" id="section-settings">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Settings</h2>
+        <p class="page-sub">Manage your reading space.</p>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Dark Mode</div>
+          <div class="settings-desc">Switch between light and dark themes.</div>
+        </div>
+        <button class="toggle-switch" id="settingsDarkToggle">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+      <div class="settings-row danger-row">
+        <div>
+          <div class="settings-label">Clear All Data</div>
+          <div class="settings-desc">Remove all books, notes and documents. This cannot be undone.</div>
+        </div>
+        <button class="btn-danger" id="clearDataBtn">Clear Data</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== BOOK DETAIL MODAL (overlay) ===== -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-card" id="modalCard"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
