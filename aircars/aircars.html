@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirCars — The Future of Mobility</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020617;
+  --surface: #0a1628;
+  --card: #0d1f3c;
+  --emerald: #34d399;
+  --emerald-dim: rgba(52,211,153,0.12);
+  --emerald-border: rgba(52,211,153,0.25);
+  --gold: #fbbf24;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --radius: 18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+}
+
+/* ─── CURSOR ─── */
+.cursor{
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--emerald);
+  position:fixed;pointer-events:none;
+  z-index:9999;transform:translate(-50%,-50%);
+  transition:transform 0.1s,width 0.2s,height 0.2s,opacity 0.2s;
+  mix-blend-mode:screen;
+}
+.cursor-ring{
+  width:38px;height:38px;
+  border-radius:50%;
+  border:1px solid rgba(52,211,153,0.5);
+  position:fixed;pointer-events:none;
+  z-index:9998;transform:translate(-50%,-50%);
+  transition:transform 0.12s ease,width 0.2s,height 0.2s;
+}
+
+/* ─── NOISE OVERLAY ─── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:0.35;
+}
+
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 5%;
+  background:rgba(2,6,23,0.75);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--emerald-border);
+  transition:padding 0.3s;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.7rem;letter-spacing:0.12em;
+  color:var(--emerald);
+}
+.nav-logo span{color:var(--gold);}
+.nav-links{display:flex;gap:32px;}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:0.88rem;
+  font-weight:500;letter-spacing:0.06em;text-transform:uppercase;
+  transition:color 0.2s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:100%;height:1px;
+  background:var(--emerald);transition:right 0.25s;
+}
+.nav-links a:hover{color:var(--emerald);}
+.nav-links a:hover::after{right:0;}
+.nav-cta{
+  background:var(--emerald);color:#020617;
+  border:none;padding:9px 22px;border-radius:99px;
+  font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;
+  cursor:pointer;letter-spacing:0.06em;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.nav-cta:hover{transform:scale(1.06);box-shadow:0 0 24px rgba(52,211,153,0.4);}
+.nav-menu-toggle{display:none;background:none;border:none;color:var(--emerald);font-size:1.5rem;cursor:pointer;}
+
+/* ─── HERO ─── */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:120px 5% 80px;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 60% 40%, rgba(52,211,153,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(251,191,36,0.05) 0%, transparent 60%),
+    var(--bg);
+}
+.hero-grid{
+  position:absolute;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(52,211,153,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(52,211,153,0.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+.hero-content{position:relative;z-index:2;max-width:660px;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--emerald-dim);
+  border:1px solid var(--emerald-border);
+  border-radius:99px;padding:6px 16px;
+  font-size:0.75rem;font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--emerald);
+  margin-bottom:24px;
+  animation:fadeUp 0.6s ease both;
+}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:blink 1.4s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.2rem,9vw,7rem);
+  line-height:0.95;
+  letter-spacing:0.03em;
+  margin-bottom:28px;
+  animation:fadeUp 0.7s 0.1s ease both;
+}
+h1 .accent{color:var(--emerald);}
+h1 .gold{color:var(--gold);}
+.hero-sub{
+  font-size:1.05rem;font-weight:300;color:var(--muted);
+  line-height:1.8;max-width:480px;margin-bottom:40px;
+  animation:fadeUp 0.7s 0.2s ease both;
+}
+.hero-btns{
+  display:flex;gap:14px;flex-wrap:wrap;
+  animation:fadeUp 0.7s 0.3s ease both;
+}
+.btn-primary{
+  background:var(--emerald);color:#020617;
+  border:none;padding:14px 32px;border-radius:99px;
+  font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;
+  cursor:pointer;letter-spacing:0.04em;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.btn-primary:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(52,211,153,0.45);}
+.btn-outline{
+  background:transparent;color:var(--text);
+  border:1px solid rgba(255,255,255,0.18);
+  padding:14px 32px;border-radius:99px;
+  font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:500;
+  cursor:pointer;letter-spacing:0.04em;
+  transition:border-color 0.2s,color 0.2s;
+}
+.btn-outline:hover{border-color:var(--emerald);color:var(--emerald);}
+.hero-img-wrap{
+  position:absolute;right:-2%;top:50%;transform:translateY(-50%);
+  width:54%;max-width:700px;z-index:1;
+  animation:floatIn 1s 0.3s ease both;
+}
+.hero-img-wrap img{
+  width:100%;object-fit:cover;
+  filter:drop-shadow(0 0 60px rgba(52,211,153,0.25));
+}
+@keyframes floatIn{from{opacity:0;transform:translateY(-46%) translateX(40px)}to{opacity:1;transform:translateY(-50%) translateX(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── STATS ─── */
+.stats{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--emerald-border);
+  border-top:1px solid var(--emerald-border);
+  border-bottom:1px solid var(--emerald-border);
+}
+.stat-box{
+  background:rgba(2,6,23,0.92);
+  padding:40px 32px;text-align:center;
+  transition:background 0.3s;
+}
+.stat-box:hover{background:var(--emerald-dim);}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3rem;color:var(--emerald);
+  letter-spacing:0.04em;
+}
+.stat-label{color:var(--muted);font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;margin-top:4px;}
+
+/* ─── SECTION GENERIC ─── */
+section{position:relative;z-index:2;padding:100px 5%;}
+.section-eyebrow{
+  font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--emerald);font-weight:600;margin-bottom:14px;
+}
+h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2rem,5vw,3.8rem);
+  letter-spacing:0.04em;line-height:1;
+  margin-bottom:20px;
+}
+.divider{
+  width:50px;height:2px;
+  background:linear-gradient(90deg,var(--emerald),transparent);
+  margin-bottom:28px;
+}
+
+/* ─── FEATURE SPLIT ─── */
+.feature-split{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:64px;align-items:center;
+  max-width:1200px;margin:0 auto;
+}
+.feature-split.reverse{direction:rtl;}
+.feature-split.reverse>*{direction:ltr;}
+.feature-text{}
+.feature-text p{color:var(--muted);line-height:1.85;font-size:0.97rem;margin-bottom:20px;}
+.feature-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;}
+.tag{
+  background:var(--emerald-dim);
+  border:1px solid var(--emerald-border);
+  border-radius:99px;padding:6px 16px;
+  font-size:0.78rem;color:var(--emerald);
+  font-weight:500;letter-spacing:0.06em;
+}
+.feature-img-wrap{
+  border-radius:var(--radius);overflow:hidden;
+  position:relative;
+}
+.feature-img-wrap::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  border-radius:inherit;
+  border:1px solid var(--emerald-border);
+  pointer-events:none;
+}
+.feature-img-wrap img{
+  width:100%;height:380px;object-fit:cover;display:block;
+  transition:transform 0.6s ease;
+  filter:brightness(0.85) saturate(1.1);
+}
+.feature-img-wrap:hover img{transform:scale(1.04);}
+.glow-label{
+  position:absolute;bottom:20px;left:20px;z-index:2;
+  background:rgba(2,6,23,0.82);backdrop-filter:blur(10px);
+  border:1px solid var(--emerald-border);
+  border-radius:10px;padding:10px 16px;
+  font-size:0.78rem;color:var(--emerald);font-weight:600;
+  letter-spacing:0.08em;
+}
+
+/* ─── TIMELINE ─── */
+.timeline-section{background:var(--surface);}
+.timeline{
+  position:relative;max-width:800px;margin:0 auto;
+  padding-left:40px;
+}
+.timeline::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:2px;
+  background:linear-gradient(180deg,var(--emerald),rgba(52,211,153,0.1));
+}
+.tl-item{
+  position:relative;margin-bottom:48px;
+  opacity:0;transform:translateX(-20px);
+  transition:opacity 0.5s,transform 0.5s;
+}
+.tl-item.visible{opacity:1;transform:translateX(0);}
+.tl-dot{
+  position:absolute;left:-48px;top:4px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--emerald);
+  box-shadow:0 0 16px rgba(52,211,153,0.6);
+}
+.tl-year{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;color:var(--gold);
+  letter-spacing:0.1em;margin-bottom:6px;
+}
+.tl-title{font-size:1.05rem;font-weight:600;margin-bottom:8px;}
+.tl-desc{color:var(--muted);font-size:0.9rem;line-height:1.7;}
+
+/* ─── CARDS GRID ─── */
+.cards-section{}
+.cards-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;max-width:1200px;margin:0 auto;
+}
+.info-card{
+  background:var(--card);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:var(--radius);
+  padding:32px 28px;
+  transition:transform 0.3s,border-color 0.3s,box-shadow 0.3s;
+  position:relative;overflow:hidden;
+}
+.info-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--emerald),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.info-card:hover{
+  transform:translateY(-6px);
+  border-color:var(--emerald-border);
+  box-shadow:0 20px 50px rgba(52,211,153,0.1);
+}
+.info-card:hover::before{opacity:1;}
+.card-icon{
+  font-size:2rem;margin-bottom:16px;
+  filter:drop-shadow(0 0 8px rgba(52,211,153,0.4));
+}
+.card-title{font-size:1.05rem;font-weight:600;margin-bottom:10px;}
+.card-body{color:var(--muted);font-size:0.88rem;line-height:1.75;}
+
+/* ─── CTA BANNER ─── */
+.cta-section{
+  background:linear-gradient(135deg,rgba(52,211,153,0.12),rgba(251,191,36,0.06));
+  border-top:1px solid var(--emerald-border);
+  border-bottom:1px solid var(--emerald-border);
+  text-align:center;
+}
+.cta-section h2{margin-bottom:16px;}
+.cta-section p{color:var(--muted);max-width:480px;margin:0 auto 36px;line-height:1.8;}
+
+/* ─── FOOTER ─── */
+footer{
+  background:var(--surface);
+  border-top:1px solid rgba(255,255,255,0.05);
+  padding:40px 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+  position:relative;z-index:2;
+}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--emerald);letter-spacing:0.12em;}
+.footer-links{display:flex;gap:24px;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;}
+.footer-links a:hover{color:var(--emerald);}
+.footer-copy{color:var(--muted);font-size:0.78rem;}
+
+/* ─── SCROLL REVEAL ─── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 0.65s,transform 0.65s;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ─── MOBILE ─── */
+@media(max-width:900px){
+  .hero-img-wrap{display:none;}
+  .hero-content{max-width:100%;}
+  .feature-split,.feature-split.reverse{grid-template-columns:1fr;gap:32px;direction:ltr;}
+  .cards-grid{grid-template-columns:1fr 1fr;}
+  .stats{grid-template-columns:1fr;}
+  .nav-links,.nav-cta{display:none;}
+  .nav-menu-toggle{display:block;}
+}
+@media(max-width:600px){
+  .cards-grid{grid-template-columns:1fr;}
+  h1{font-size:3.2rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">Air<span>Cars</span></div>
+  <div class="nav-links">
+    <a href="#history">History</a>
+    <a href="#modern">Modern Era</a>
+    <a href="#future">Future</a>
+    <a href="#specs">Specs</a>
+  </div>
+  <button class="nav-cta">Explore Now</button>
+  <button class="nav-menu-toggle" onclick="toggleMenu()">☰</button>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Urban Air Mobility — 2025</div>
+    <h1>THE SKY IS<br>THE <span class="accent">NEW</span><br><span class="gold">ROAD.</span></h1>
+    <p class="hero-sub">Personal air cars are no longer science fiction. Electric propulsion, autonomous navigation, and radical engineering are rewriting the laws of transportation.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('history').scrollIntoView({behavior:'smooth'})">Explore the Story</button>
+      <button class="btn-outline" onclick="document.getElementById('modern').scrollIntoView({behavior:'smooth'})">See Modern Models</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats reveal">
+  <div class="stat-box">
+    <div class="stat-num" data-target="150">0</div>
+    <div class="stat-label">mph Top Speed</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num" data-target="1900">0</div>
+    <div class="stat-label">Pioneers since</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-num" data-target="300">0</div>
+    <div class="stat-label">Mile Range (est.)</div>
+  </div>
+</div>
+
+<!-- HISTORY SECTION -->
+<section id="history">
+  <div class="feature-split reveal">
+    <div class="feature-text">
+      <div class="section-eyebrow">Chapter 01</div>
+      <h2>EARLY<br>PROTOTYPES</h2>
+      <div class="divider"></div>
+      <p>From the 1910s through the 1950s, visionary engineers pushed against the boundaries of physics and mechanics to build the first true flying automobiles. These machines were rough, dangerous, and wildly impractical — but they planted the seed.</p>
+      <p>Heavy piston engines, unpredictable aerodynamics, and analog controls made early air vehicles a challenge even for trained pilots. Yet each iteration inched closer to a dream millions would one day share.</p>
+      <div class="feature-tags">
+        <span class="tag">Piston Engines</span>
+        <span class="tag">Manual Controls</span>
+        <span class="tag">Experimental</span>
+        <span class="tag">1910s–1950s</span>
+      </div>
+    </div>
+    <div class="feature-img-wrap">
+      <img src="aircar1.jpg" alt="Early flying car prototype">
+      <div class="glow-label">Early experimental model · circa 1940s</div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section" id="timeline">
+  <div style="max-width:800px;margin:0 auto 64px;" class="reveal">
+    <div class="section-eyebrow">Evolution</div>
+    <h2>A CENTURY<br>OF FLIGHT</h2>
+    <div class="divider"></div>
+  </div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1917</div>
+      <div class="tl-title">Curtiss Autoplane — First Attempt</div>
+      <div class="tl-desc">Glenn Curtiss combined a car body with triplane wings, creating history's first flying car concept. It never fully flew, but it inspired a century of attempts.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1949</div>
+      <div class="tl-title">Moulton Taylor's Aerocar</div>
+      <div class="tl-desc">The Aerocar achieved FAA certification and could fold its wings and tail for road use — a genuine dual-mode vehicle that briefly saw limited production.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2000s</div>
+      <div class="tl-title">eVTOL Revolution Begins</div>
+      <div class="tl-desc">Electric vertical takeoff and landing (eVTOL) technology transformed the concept. Startups like Joby, Lilium, and Archer raised billions to make air taxis real.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2022</div>
+      <div class="tl-title">Klein Vision AirCar Certified</div>
+      <div class="tl-desc">The Slovak Transport Authority issued the AirCar an official airworthiness certificate, making it one of the first certified personal flying cars in history.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2025+</div>
+      <div class="tl-title">Urban Air Mobility Goes Commercial</div>
+      <div class="tl-desc">Multiple companies are targeting commercial air taxi services in major cities. The era of personal aerial vehicles as everyday transport has officially begun.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MODERN SECTION -->
+<section id="modern">
+  <div class="feature-split reverse reveal">
+    <div class="feature-text">
+      <div class="section-eyebrow">Chapter 02</div>
+      <h2>MODERN<br>DEVELOPMENTS</h2>
+      <div class="divider"></div>
+      <p>Today's air cars are engineering marvels. Electric motors replace combustion, AI-driven navigation systems handle complex air traffic, and lightweight carbon fiber composites bring structural weight to near-impossible lows.</p>
+      <p>Urban air mobility is no longer a fringe concept — it's a multi-billion dollar industry with regulatory frameworks being built in real-time across the globe.</p>
+      <div class="feature-tags">
+        <span class="tag">Electric Propulsion</span>
+        <span class="tag">AI Navigation</span>
+        <span class="tag">Carbon Fiber</span>
+        <span class="tag">eVTOL</span>
+      </div>
+    </div>
+    <div class="feature-img-wrap">
+      <img src="aircar2.jpg" alt="Modern air car in hangar">
+      <div class="glow-label">AirCar Gen 2 — Electric · Autonomous</div>
+    </div>
+  </div>
+</section>
+
+<!-- CARDS -->
+<section class="cards-section" id="future" style="background:var(--surface);">
+  <div style="text-align:center;max-width:600px;margin:0 auto 60px;" class="reveal">
+    <div class="section-eyebrow">Chapter 03</div>
+    <h2>CHALLENGES &<br>THE ROAD AHEAD</h2>
+    <div class="divider" style="margin:0 auto 20px;"></div>
+    <p style="color:var(--muted);line-height:1.8;">Urban air mobility faces real obstacles — but they're being solved faster than anyone expected.</p>
+  </div>
+  <div class="cards-grid">
+    <div class="info-card reveal">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Battery Technology</div>
+      <div class="card-body">Current battery energy density limits flight range. Solid-state batteries and hydrogen fuel cells promise to extend range to 500+ miles by 2030.</div>
+    </div>
+    <div class="info-card reveal" style="transition-delay:0.1s">
+      <div class="card-icon">🏛️</div>
+      <div class="card-title">Regulatory Frameworks</div>
+      <div class="card-body">The FAA, EASA, and CAAC are developing new airspace classifications specifically for low-altitude urban air vehicles. Certification timelines are accelerating.</div>
+    </div>
+    <div class="info-card reveal" style="transition-delay:0.2s">
+      <div class="card-icon">🏙️</div>
+      <div class="card-title">Infrastructure</div>
+      <div class="card-body">Vertiports — vertical take-off and landing hubs — are being integrated into city planning. Major airports are already building dedicated UAM terminals.</div>
+    </div>
+    <div class="info-card reveal" style="transition-delay:0.3s">
+      <div class="card-icon">🤖</div>
+      <div class="card-title">Autonomous Systems</div>
+      <div class="card-body">AI pilots with real-time collision avoidance, weather adaptation, and dynamic routing are making air cars safer than human-piloted vehicles at scale.</div>
+    </div>
+    <div class="info-card reveal" style="transition-delay:0.4s">
+      <div class="card-icon">💰</div>
+      <div class="card-title">Affordability</div>
+      <div class="card-body">Early models cost $300K–$500K. Mass production, shared ownership models, and air-taxi services aim to bring per-trip costs in line with ground rideshares.</div>
+    </div>
+    <div class="info-card reveal" style="transition-delay:0.5s">
+      <div class="card-icon">🌍</div>
+      <div class="card-title">Sustainability</div>
+      <div class="card-body">All-electric air vehicles produce zero direct emissions. Combined with renewable energy grids, they could become the cleanest form of personal transport ever.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section reveal" id="specs">
+  <div class="section-eyebrow">The Future</div>
+  <h2>READY TO<br>TAKE FLIGHT?</h2>
+  <p>Flying cars may soon become as ordinary as the vehicles in your driveway. The only question is — how soon will you be in the sky?</p>
+  <button class="btn-primary">Learn More About eVTOL</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">AirCars</div>
+  <div class="footer-links">
+    <a href="#home">Home</a>
+    <a href="#history">History</a>
+    <a href="#modern">Modern</a>
+    <a href="#future">Future</a>
+  </div>
+  <div class="footer-copy">© 2025 AirCars — Innovation in the Sky</div>
+</footer>
+
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+(function animRing(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{cursor.style.width='6px';cursor.style.height='6px';ring.style.width='52px';ring.style.height='52px';});el.addEventListener('mouseleave',()=>{cursor.style.width='14px';cursor.style.height='14px';ring.style.width='38px';ring.style.height='38px';});});
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal,.tl-item').forEach(el=>observer.observe(el));
+
+// Counter animation
+const counterObserver = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('[data-target]').forEach(el=>{
+        const target=+el.dataset.target;
+        let count=0;
+        const step=target/60;
+        const t=setInterval(()=>{count+=step;if(count>=target){el.textContent=target;clearInterval(t);}else{el.textContent=Math.floor(count);}},16);
+      });
+      counterObserver.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+document.querySelectorAll('.stats').forEach(el=>counterObserver.observe(el));
+
+// Nav shrink
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').style.padding=window.scrollY>60?'12px 5%':'18px 5%';
+});
+
+function toggleMenu(){alert('Mobile menu — wire up as needed!');}
+</script>
+</body>
+</html>
